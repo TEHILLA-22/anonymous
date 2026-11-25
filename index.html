@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tehillz - Premium Automotive Excellence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        #bee-container {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+        }
+        
+        .bee {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: beeFloat 2s ease-in-out infinite;
+        }
+        
+        .bee-body {
+            width: 35px;
+            height: 45px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .bee-stripe {
+            width: 100%;
+            height: 8px;
+            background: #000;
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .stripe1 { top: 25%; }
+        .stripe2 { top: 50%; }
+        
+        .bee-wing {
+            width: 25px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            position: absolute;
+            top: 15%;
+            animation: wingFlap 0.15s ease-in-out infinite;
+        }
+        
+        .wing-left {
+            left: -15px;
+            transform-origin: right center;
+        }
+        
+        .wing-right {
+            right: -15px;
+            transform-origin: left center;
+        }
+        
+        @keyframes beeFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        @keyframes wingFlap {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.7); }
+        }
+        
+        .bee-house {
+            position: absolute;
+            bottom: 150px;
+            right: 100px;
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            border-radius: 10px;
+            border: 3px solid #FFD700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .bee-house.visible {
+            opacity: 1;
+        }
+        
+        .bee-house::before {
+            content: '🏠';
+            font-size: 40px;
+        }
+        
+        .car-3d-container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            perspective: 1500px;
+        }
+        
+        .car-card {
+            width: 450px;
+            height: 280px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-style: preserve-3d;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            animation: carFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes carFloat {
+            0%, 100% { transform: translateX(-50%) translateY(-50%) translateZ(0px); }
+            50% { transform: translateX(-50%) translateY(-50%) translateZ(50px); }
+        }
+        
+        .car-card:hover {
+            transform: translateX(-50%) translateY(-50%) rotateY(25deg) rotateX(10deg) scale(1.15) translateZ(100px);
+            filter: drop-shadow(0 40px 80px rgba(255, 0, 0, 0.6));
+        }
+        
+        .car-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            transition: all 0.6s;
+        }
+        
+        .section {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            overflow: hidden;
+        }
+        
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease-out;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .glass-panel:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(255, 0, 0, 0.3);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-20px) scale(1.1) rotateZ(5deg);
+            box-shadow: 0 30px 60px rgba(255, 0, 0, 0.4);
+            border-color: rgba(255, 0, 0, 0.5);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            color: white;
+            padding: 16px 48px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-8px) scale(1.1);
+            box-shadow: 0 20px 50px rgba(255, 0, 0, 0.8);
+        }
+        
+        .feature-card {
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(0, 100, 255, 0.2));
+            opacity: 0;
+            transition: opacity 0.5s;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+        
+        .feature-card:hover::after {
+            opacity: 1;
+        }
+        
+        .feature-card:hover {
+            transform: rotateY(15deg) rotateX(10deg) translateZ(40px) scale(1.08);
+            box-shadow: 0 40px 80px rgba(255, 0, 0, 0.4);
+        }
+        
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        nav.scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px) scale(0.9) rotateX(20deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0deg);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-20px); }
+            60% { transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Bee Element -->
+    <div id="bee-container">
+        <div class="bee">
+            <div class="bee-body">
+                <div class="bee-stripe stripe1"></div>
+                <div class="bee-stripe stripe2"></div>
+            </div>
+            <div class="bee-wing wing-left"></div>
+            <div class="bee-wing wing-right"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="px-8 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold orbitron text-red-500">Tehillz_flash</h1>
+            <div class="flex gap-8">
+                <a href="#hero" class="hover:text-red-500 transition-colors">Home</a>
+                <a href="#fleet" class="hover:text-red-500 transition-colors">Fleet</a>
+                <a href="#performance" class="hover:text-red-500 transition-colors">Performance</a>
+                <a href="#technology" class="hover:text-red-500 transition-colors">Technology</a>
+                <a href="#contact" class="hover:text-red-500 transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="section" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%);">
+        <div class="parallax-bg" style="background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1200 800\"><rect fill=\"%23000\" width=\"1200\" height=\"800\"/><circle cx=\"200\" cy=\"200\" r=\"2\" fill=\"%23fff\" opacity=\"0.3\"/><circle cx=\"600\" cy=\"300\" r=\"1\" fill=\"%23fff\" opacity=\"0.5\"/><circle cx=\"1000\" cy=\"150\" r=\"2\" fill=\"%23fff\" opacity=\"0.4\"/><circle cx=\"400\" cy=\"600\" r=\"1\" fill=\"%23fff\" opacity=\"0.6\"/></svg>');"></div>
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <h2 class="text-7xl font-black orbitron mb-6 fade-in-up" style="animation-delay: 0.2s;">REDEFINE <span class="text-red-500">VELOCITY</span></h2>
+            <p class="text-xl text-gray-300 mb-12 fade-in-up" style="animation-delay: 0.4s;">Experience automotive excellence where engineering meets artistry</p>
+            <div class="car-3d-container fade-in-up" style="animation-delay: 0.6s;">
+                <div class="car-card" id="hero-car" style="transform: translateX(-50%) translateY(-50%);">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 450 280'><defs><linearGradient id='carGrad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%23ff0000'/><stop offset='100%' style='stop-color:%23990000'/></linearGradient></defs><rect fill='%23000' width='450' height='280'/><ellipse cx='225' cy='140' rx='180' ry='60' fill='url(%23carGrad)'/><rect x='120' y='110' width='210' height='50' rx='10' fill='%23222'/><circle cx='150' cy='180' r='25' fill='%23333'/><circle cx='300' cy='180' r='25' fill='%23333'/><text x='225' y='150' font-family='Arial' font-size='24' fill='%23fff' text-anchor='middle'>Tehillz_flash X1</text></svg>" alt="Tehillz_flash X1" class="car-image">
+                </div>
+            </div>
+            <button class="btn-primary fade-in-up" style="animation-delay: 0.8s;" onclick="scrollToSection('fleet')">EXPLORE COLLECTION</button>
+            <div class="scroll-indicator">
+                <svg width="30" height="50" viewBox="0 0 30 50">
+                    <rect x="5" y="5" width="20" height="35" rx="10" fill="none" stroke="#fff" stroke-width="2"/>
+                    <circle cx="15" cy="15" r="3" fill="#fff">
+                        <animate attributeName="cy" from="15" to="30" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fleet Section -->
+    <section id="fleet" class="section" style="background: linear-gradient(135deg, #1a0a0a 0%, #0a0a1a 100%);">
+        <div class="max-w-7xl mx-auto w-full relative z-10">
+            <h2 class="text-6xl font-black orbitron mb-16 text-center">OUR <span class="text-red-500">FLEET</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-panel feature-card transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-48 mb-6 rounded-lg overflow-hidden">
+                        <img src="https://www.bing.com/th/id/OIP.pAXIzKDMSU712SggI2ZrIwHaEo?w=245&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2<defs><linearGradient id='g1' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%23ff0000'/><stop offset='100%' style='stop-color:%23cc0000'/></linearGradient></defs><rect fill='%23111' width='400' height='200'/><ellipse cx='200' cy='100' rx='150' ry='50' fill='url(%23g1)'/><rect x='120' y='75' width='160' height='40' rx='8' fill='%23222'/><circle cx='140' cy='135' r='20' fill='%23444'/><circle cx='260' cy='135' r='20' fill='%23444'/></svg>" alt="Tehillz_flash GT-R" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <h3 class="text-2xl font-bold orbitron mb-3 text-red-500">Tehillz_flash GT-R</h3>
+                    <p class="text-gray-400 mb-4">The pinnacle of speed and precision. 0-60 mph in 2.8 seconds with a top speed of 205 mph.</p>
+                    <div class="flex justify-between text-sm">
+                        <span>🏁 750 HP</span>
+                        <span>⚡ Electric Hybrid</span>
+                        <span>💰 $185,000</span>
+                    </div>
+                    <button class="btn-primary w-full mt-6" onclick="showDetails('GT-R')">CONFIGURE</button>
+                </div>
+                
+                <div class="glass-panel feature-card transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-48 mb-6 rounded-lg overflow-hidden">
+                        <img src="https://www.bing.com/th/id/OIP.AyGCkA_ap8cqz8uRUeUeggHaEK?w=269&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2<defs><linearGradient id='g2' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%230066ff'/><stop offset='100%' style='stop-color:%230044cc'/></linearGradient></defs><rect fill='%23111' width='400' height='200'/><ellipse cx='200' cy='100' rx='150' ry='50' fill='url(%23g2)'/><rect x='120' y='75' width='160' height='40' rx='8' fill='%23222'/><circle cx='140' cy='135' r='20' fill='%23444'/><circle cx='260' cy='135' r='20' fill='%23444'/></svg>" alt="Tehillz_flash Luxe" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <h3 class="text-2xl font-bold orbitron mb-3 text-blue-500">Tehillz_flash LUXE</h3>
+                    <p class="text-gray-400 mb-4">Where luxury meets performance. Executive comfort with sports car agility and cutting-edge AI.</p>
+                    <div class="flex justify-between text-sm">
+                        <span>🏁 580 HP</span>
+                        <span>⚡ Full Electric</span>
+                        <span>💰 $145,000</span>
+                    </div>
+                    <button class="btn-primary w-full mt-6" onclick="showDetails('Luxe')">CONFIGURE</button>
+                </div>
+                
+                <div class="glass-panel feature-card transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-48 mb-6 rounded-lg overflow-hidden">
+                        <img src="https://www.bing.com/th/id/OIP.czZ08Pgd9jMckzPuRM64rgHaEK?w=211&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2<defs><linearGradient id='g3' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%2300ff00'/><stop offset='100%' style='stop-color:%2300cc00'/></linearGradient></defs><rect fill='%23111' width='400' height='200'/><ellipse cx='200' cy='100' rx='150' ry='50' fill='url(%23g3)'/><rect x='120' y='75' width='160' height='40' rx='8' fill='%23222'/><circle cx='140' cy='135' r='20' fill='%23444'/><circle cx='260' cy='135' r='20' fill='%23444'/></svg>" alt="Tehillz_flash EcoSport" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <h3 class="text-2xl font-bold orbitron mb-3 text-green-500">Tehillz_flash ECO-SPORT</h3>
+                    <p class="text-gray-400 mb-4">Sustainable performance. Zero emissions with 400-mile range and exhilarating acceleration.</p>
+                    <div class="flex justify-between text-sm">
+                        <span>🏁 450 HP</span>
+                        <span>⚡ Full Electric</span>
+                        <span>💰 $89,000</span>
+                    </div>
+                    <button class="btn-primary w-full mt-6" onclick="showDetails('EcoSport')">CONFIGURE</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Section -->
+    <section id="performance" class="section" style="background: linear-gradient(135deg, #0a0a1a 0%, #1a1a0a 100%);">
+        <div class="max-w-7xl mx-auto w-full relative z-10">
+            <h2 class="text-6xl font-black orbitron mb-16 text-center">UNMATCHED <span class="text-red-500">PERFORMANCE</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <div class="stat-card text-center">
+                    <div class="text-5xl font-black orbitron text-red-500 mb-3" id="stat1">0</div>
+                    <p class="text-gray-400">Peak Horsepower</p>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="text-5xl font-black orbitron text-red-500 mb-3" id="stat2">0</div>
+                    <p class="text-gray-400">0-60 mph (seconds)</p>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="text-5xl font-black orbitron text-red-500 mb-3" id="stat3">0</div>
+                    <p class="text-gray-400">Top Speed (mph)</p>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="text-5xl font-black orbitron text-red-500 mb-3" id="stat4">0</div>
+                    <p class="text-gray-400">Electric Range (mi)</p>
+                </div>
+            </div>
+            <div class="glass-panel">
+                <h3 class="text-3xl font-bold orbitron mb-8 text-center">Engineering Excellence</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-bold mb-4 text-red-500">⚡ Powertrain Innovation</h4>
+                        <p class="text-gray-300 leading-relaxed">Our proprietary hybrid-electric powertrain delivers instantaneous torque while maintaining efficiency. Dual-motor all-wheel drive with torque vectoring ensures optimal power distribution in every driving scenario.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-4 text-red-500">🎯 Aerodynamic Mastery</h4>
+                        <p class="text-gray-300 leading-relaxed">Active aerodynamics with computer-controlled spoilers and air intakes adapt in real-time. Our wind-tunnel tested design achieves a drag coefficient of just 0.23 for maximum efficiency and stability.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-4 text-red-500">🔧 Carbon Fiber Construction</h4>
+                        <p class="text-gray-300 leading-relaxed">Aerospace-grade carbon fiber monocoque chassis reduces weight by 40% while increasing structural rigidity. Every component is precision-engineered for the perfect strength-to-weight ratio.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-4 text-red-500">🛡️ Advanced Safety Suite</h4>
+                        <p class="text-gray-300 leading-relaxed">AI-powered collision avoidance, adaptive cruise control, and 360° sensor coverage. Our vehicles earned 5-star ratings in every safety category with groundbreaking protective technology.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="section" style="background: linear-gradient(135deg, #1a1a0a 0%, #0a1a1a 100%);">
+        <div class="max-w-7xl mx-auto w-full relative z-10">
+            <h2 class="text-6xl font-black orbitron mb-16 text-center">FUTURE <span class="text-red-500">TECHNOLOGY</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass-panel transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-64 mb-6 rounded-lg bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="#fff" stroke-width="2">
+                                <animate attributeName="r" from="60" to="70" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" from="1" to="0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="75" cy="75" r="40" fill="#fff" opacity="0.2"/>
+                            <text x="75" y="85" font-family="Arial" font-size="48" fill="#fff" text-anchor="middle">AI</text>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold orbitron mb-4">Autonomous Driving AI</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">Level 4 autonomous capability with neural network processing 1 trillion operations per second. Machine learning adapts to your driving style and preferences over time.</p>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>✓ Self-parking & summon features</li>
+                        <li>✓ Highway autopilot with lane changes</li>
+                        <li>✓ Traffic light & sign recognition</li>
+                        <li>✓ Predictive navigation routing</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-panel transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-64 mb-6 rounded-lg bg-gradient-to-br from-red-900 to-orange-900 flex items-center justify-center">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <rect x="30" y="40" width="90" height="70" rx="10" fill="none" stroke="#fff" stroke-width="2"/>
+                            <line x1="75" y1="40" x2="75" y2="20" stroke="#fff" stroke-width="2"/>
+                            <circle cx="75" cy="15" r="5" fill="#fff"/>
+                            <path d="M 50 70 Q 75 90 100 70" fill="none" stroke="#fff" stroke-width="3"/>
+                            <circle cx="60" cy="65" r="3" fill="#fff"/>
+                            <circle cx="90" cy="65" r="3" fill="#fff"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold orbitron mb-4">Augmented Reality HUD</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">Full-windshield AR display projects navigation, performance metrics, and safety warnings directly into your line of sight without distraction.</p>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>✓ Real-time navigation overlay</li>
+                        <li>✓ Night vision enhancement</li>
+                        <li>✓ Speed & performance metrics</li>
+                        <li>✓ Hazard detection highlighting</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-panel transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-64 mb-6 rounded-lg bg-gradient-to-br from-green-900 to-teal-900 flex items-center justify-center">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="50" fill="none" stroke="#fff" stroke-width="2"/>
+                            <path d="M 75 30 L 75 75 L 100 75" stroke="#fff" stroke-width="3" fill="none"/>
+                            <text x="75" y="125" font-family="Arial" font-size="16" fill="#fff" text-anchor="middle">ECO MODE</text>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold orbitron mb-4">Smart Energy Management</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">AI-optimized battery management system maximizes range through predictive routing and regenerative braking algorithms.</p>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>✓ 400-mile maximum range</li>
+                        <li>✓ 15-minute fast charging</li>
+                        <li>✓ Bi-directional charging capability</li>
+                        <li>✓ Solar roof integration option</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-panel transform hover:scale-105 transition-all duration-500">
+                    <div class="w-full h-64 mb-6 rounded-lg bg-gradient-to-br from-yellow-900 to-red-900 flex items-center justify-center">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="45" fill="none" stroke="#fff" stroke-width="2"/>
+                            <circle cx="75" cy="75" r="35" fill="none" stroke="#fff" stroke-width="2"/>
+                            <circle cx="75" cy="75" r="10" fill="#fff">
+                                <animate attributeName="r" from="10" to="45" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" from="1" to="0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <line x1="75" y1="50" x2="75" y2="100" stroke="#fff" stroke-width="2"/>
+                            <line x1="50" y1="75" x2="100" y2="75" stroke="#fff" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold orbitron mb-4">Connected Vehicle Platform</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">5G connectivity enables over-the-air updates, remote diagnostics, and seamless integration with your digital ecosystem.</p>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>✓ Remote vehicle control via app</li>
+                        <li>✓ Real-time diagnostics & updates</li>
+                        <li>✓ Smart home integration</li>
+                        <li>✓ Vehicle-to-vehicle communication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section with Bee House -->
+    <section id="contact" class="section relative" style="background: linear-gradient(135deg, #0a1a1a 0%, #000 100%); min-height: 100vh;">
+        <div class="bee-house" id="beeHouse">
+            <div id="resting-bee" style="display: none; font-size: 30px;">🐝</div>
+        </div>
+        <div class="max-w-7xl mx-auto w-full relative z-10">
+            <h2 class="text-6xl font-black orbitron mb-16 text-center">GET IN <span class="text-red-500">TOUCH</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass-panel">
+                    <h3 class="text-3xl font-bold orbitron mb-6">Schedule Your Test Drive</h3>
+                    <form onsubmit="handleSubmit(event)" class="space-y-6">
+                        <div>
+                            <label class="block text-gray-400 mb-2">Full Name</label>
+                            <input type="text" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Email Address</label>
+                            <input type="email" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Phone Number</label>
+                            <input type="tel" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Preferred Model</label>
+                            <select required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none transition-all">
+                                <option value="">Select a model</option>
+                                <option value="gtr">Tehillz_flash GT-R</option>
+                                <option value="luxe">Tehillz_flash Luxe</option>
+                                <option value="eco">Tehillz_flash Eco-Sport</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Message</label>
+                            <textarea rows="4" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none transition-all"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">BOOK TEST DRIVE</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <div class="glass-panel mb-6">
+                        <h3 class="text-2xl font-bold orbitron mb-6">Visit Our Showroom</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <p class="flex items-start gap-3">
+                                <span class="text-2xl">📍</span>
+                                <span>1000 Innovation Drive<br>Silicon Valley, CA 94025</span>
+                            </p>
+                            <p class="flex items-start gap-3">
+                                <span class="text-2xl">📞</span>
+                                <span>+1 (555) Tehillz_flash<br>+1 (555) 835-6248</span>
+                            </p>
+                            <p class="flex items-start gap-3">
+                                <span class="text-2xl">✉️</span>
+                                <span>info@Tehillz_flash.com<br>sales@Tehillz_flash.com</span>
+                            </p>
+                            <p class="flex items-start gap-3">
+                                <span class="text-2xl">🕐</span>
+                                <span>Monday - Saturday: 9AM - 8PM<br>Sunday: 10AM - 6PM</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel">
+                        <h3 class="text-2xl font-bold orbitron mb-4">Follow Us</h3>
+                        <div class="flex gap-4">
+                            <button onclick="openSocial('facebook')" class="stat-card flex-1 py-6 hover:bg-blue-500/20">
+                                <div class="text-3xl mb-2">📘</div>
+                                <div class="text-sm">Facebook</div>
+                            </button>
+                            <button onclick="openSocial('instagram')" class="stat-card flex-1 py-6 hover:bg-pink-500/20">
+                                <div class="text-3xl mb-2">📷</div>
+                                <div class="text-sm">Instagram</div>
+                            </button>
+                            <button onclick="openSocial('twitter')" class="stat-card flex-1 py-6 hover:bg-blue-400/20">
+                                <div class="text-3xl mb-2">🐦</div>
+                                <div class="text-sm">Twitter</div>
+                            </button>
+                            <button onclick="openSocial('youtube')" class="stat-card flex-1 py-6 hover:bg-red-500/20">
+                                <div class="text-3xl mb-2">📺</div>
+                                <div class="text-sm">YouTube</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-white/10 py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-2xl font-bold orbitron text-red-500 mb-4">Tehillz_flash</h4>
+                    <p class="text-gray-400">Redefining automotive excellence since 2020. Engineering the future of mobility.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Quick Links</h5>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#hero" class="hover:text-red-500 transition-colors">Home</a></li>
+                        <li><a href="#fleet" class="hover:text-red-500 transition-colors">Our Fleet</a></li>
+                        <li><a href="#performance" class="hover:text-red-500 transition-colors">Performance</a></li>
+                        <li><a href="#technology" class="hover:text-red-500 transition-colors">Technology</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Support</h5>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="showModal('financing')" class="hover:text-red-500 transition-colors">Financing Options</a></li>
+                        <li><a href="#" onclick="showModal('warranty')" class="hover:text-red-500 transition-colors">Warranty Information</a></li>
+                        <li><a href="#" onclick="showModal('service')" class="hover:text-red-500 transition-colors">Service Centers</a></li>
+                        <li><a href="#" onclick="showModal('faq')" class="hover:text-red-500 transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">Newsletter</h5>
+                    <p class="text-gray-400 mb-4">Stay updated with latest models and exclusive offers.</p>
+                    <form onsubmit="subscribeNewsletter(event)" class="flex gap-2">
+                        <input type="email" placeholder="Your email" required class="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 focus:border-red-500 focus:outline-none text-sm">
+                        <button type="submit" class="px-6 py-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors">→</button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Tehillz_flash Automotive. All rights reserved. | <a href="#" onclick="showModal('privacy')" class="hover:text-red-500">Privacy Policy</a> | <a href="#" onclick="showModal('terms')" class="hover:text-red-500">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Bee Animation with defined orbit
+        const bee = document.getElementById('bee-container');
+        const beeHouse = document.getElementById('beeHouse');
+        const restingBee = document.getElementById('resting-bee');
+        let beeResting = false;
+        let beeAngle = 0;
+        let orbitRadius = 200;
+        let orbitCenterX = window.innerWidth / 2;
+        let orbitCenterY = 200;
+
+        function updateBeePosition() {
+            if (beeResting) return;
+            
+            const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            
+            // Update orbit parameters based on scroll
+            orbitCenterY = 150 + scrollProgress * (window.innerHeight * 0.6);
+            orbitRadius = 150 + Math.sin(scrollProgress * Math.PI) * 100;
+            
+            // Check if near footer
+            if (scrollProgress > 0.85) {
+                const houseRect = beeHouse.getBoundingClientRect();
+                const targetX = houseRect.left + houseRect.width / 2;
+                const targetY = houseRect.top + houseRect.height / 2;
+                beeHouse.classList.add('visible');
+                
+                // Spiral into the house
+                const spiralSpeed = (scrollProgress - 0.85) * 20;
+                orbitRadius = Math.max(5, orbitRadius - spiralSpeed * 10);
+                orbitCenterX += (targetX - orbitCenterX) * 0.1;
+                orbitCenterY += (targetY - orbitCenterY) * 0.1;
+                
+                // Check if bee reached house
+                if (orbitRadius < 30) {
+                    beeResting = true;
+                    bee.style.opacity = '0';
+                    bee.style.transform = 'scale(0) rotate(720deg)';
+                    setTimeout(() => {
+                        restingBee.style.display = 'block';
+                        restingBee.style.animation = 'beeEnter 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+                    }, 300);
+                }
+            } else {
+                beeHouse.classList.remove('visible');
+                orbitCenterX = window.innerWidth / 2;
+            }
+            
+            // Calculate orbital position
+            beeAngle += 0.02 + scrollProgress * 0.03; // Speed increases as you scroll
+            const beeX = orbitCenterX + Math.cos(beeAngle) * orbitRadius;
+            const beeY = orbitCenterY + Math.sin(beeAngle) * orbitRadius * 0.5; // Elliptical orbit
+            
+            bee.style.left = beeX + 'px';
+            bee.style.top = beeY + 'px';
+            
+            // Rotate bee in direction of movement
+            const nextX = orbitCenterX + Math.cos(beeAngle + 0.1) * orbitRadius;
+            const nextY = orbitCenterY + Math.sin(beeAngle + 0.1) * orbitRadius * 0.5;
+            const angle = Math.atan2(nextY - beeY, nextX - beeX);
+            bee.style.transform = `rotate(${angle}rad) scale(${1 + Math.sin(beeAngle * 2) * 0.1})`;
+        }
+
+        setInterval(updateBeePosition, 1000 / 60);
+
+        // Mouse interaction with bee - perturbs orbit slightly
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!beeResting) {
+                const dx = mouseX - orbitCenterX;
+                const dy = mouseY - orbitCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 300) {
+                    orbitCenterX += dx * 0.01;
+                    orbitCenterY += dy * 0.01;
+                }
+            }
+        });
+
+        // Parallax effect with more dramatic movement
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.parallax-bg').forEach((bg, index) => {
+                const speed = 0.5 + index * 0.2;
+                bg.style.transform = `translateY(${scrolled * speed}px) scale(${1 + scrolled * 0.0002})`;
+            });
+            
+            // Nav background on scroll with smooth transition
+            const nav = document.querySelector('nav');
+            if (scrolled > 100) {
+                nav.classList.add('scrolled');
+                nav.style.transform = 'translateY(0)';
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // 3D Car rotation on mouse move
+        const heroCar = document.getElementById('hero-car');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 30;
+            const y = (e.clientY / window.innerHeight - 0.5) * 30;
+            heroCar.style.transform = `translateX(-50%) translateY(-50%) rotateY(${x}deg) rotateX(${-y}deg)`;
+        });
+
+        // Animate stats counter
+        function animateCounter(id, target, suffix = '') {
+            const element = document.getElementById(id);
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + suffix;
+            }, 20);
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.id === 'performance') {
+                        animateCounter('stat1', 750, 'HP');
+                        animateCounter('stat2', 2.8, 's');
+                        animateCounter('stat3', 205);
+                        animateCounter('stat4', 400);
+                    }
+                    entry.target.querySelectorAll('.fade-in-up').forEach((el, index) => {
+                        setTimeout(() => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Smooth scroll function
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Navigation links smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Car details modal
+        function showDetails(model) {
+            alert(`🚗 ${model} Configuration\n\nOpening vehicle configurator...\n\n✓ Choose your color\n✓ Select interior options\n✓ Add performance packages\n✓ Customize features\n\nOur team will contact you shortly!`);
+        }
+
+        // Form submission
+        function handleSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'BOOKING...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = '✓ BOOKED!';
+                setTimeout(() => {
+                    alert('🎉 Thank you for your interest!\n\nYour test drive has been scheduled.\nOur team will contact you within 24 hours to confirm your appointment.\n\nWe look forward to seeing you!');
+                    e.target.reset();
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 1000);
+            }, 2000);
+        }
+
+        // Newsletter subscription
+        function subscribeNewsletter(e) {
+            e.preventDefault();
+            const input = e.target.querySelector('input');
+            const btn = e.target.querySelector('button');
+            btn.textContent = '✓';
+            setTimeout(() => {
+                alert('✉️ Subscribed!\n\nYou\'ll receive exclusive updates about new models, special offers, and automotive innovations.');
+                input.value = '';
+                btn.textContent = '→';
+            }, 500);
+        }
+
+        // Social media links
+        function openSocial(platform) {
+            const urls = {
+                facebook: 'https://facebook.com/Tehilla_odjoji',
+                instagram: 'https://instagram.com/Tehillz_flash',
+                twitter: 'https://twitter.com/Tehillz_flash',
+                youtube: 'https://youtube.com/Tehillz_flash'
+            };
+            alert(`Opening ${platform.charAt(0).toUpperCase() + platform.slice(1)}...\n\n${urls[platform]}\n\nFollow us for exclusive content!`);
+        }
+
+        // Modal system
+        function showModal(type) {
+            const content = {
+                financing: '💰 Financing Options\n\n• 0% APR for 60 months\n• Flexible lease programs\n• Trade-in valuations\n• Pre-approval in minutes\n\nContact our finance team for personalized options.',
+                warranty: '🛡️ Warranty Coverage\n\n• 5-year/60,000-mile basic warranty\n• 8-year/100,000-mile powertrain\n• Lifetime battery warranty\n• 24/7 roadside assistance\n\nPeace of mind included.',
+                service: '🔧 Service Centers\n\n• 200+ locations nationwide\n• Mobile service available\n• Certified technicians\n• Genuine parts guarantee\n\nFind your nearest center on our website.',
+                faq: '❓ Frequently Asked Questions\n\n• Charging time: 15-45 minutes\n• Range: Up to 400 miles\n• Top speed: 205 mph\n• Autonomous features: Level 4\n\nMore questions? Contact us!',
+                privacy: '🔒 Privacy Policy\n\nWe protect your data with industry-leading security measures.\n\nVisit Tehillz_flash.com/privacy for full details.',
+                terms: '📄 Terms of Service\n\nBy using our services, you agree to our terms and conditions.\n\nVisit Tehillz_flash.com/terms for complete information.'
+            };
+            alert(content[type] || 'Information coming soon!');
+        }
+
+        // Add entrance animations
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(40px)';
+            });
+        });
+
+        // 3D card tilt effect for fleet cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
